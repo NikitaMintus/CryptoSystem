@@ -42,30 +42,48 @@ class CryptoMethods extends Model
         $a = $this->affineParams['a'];
         $b = $this->affineParams['b'];
         $m = count($this->alphabet);
-        $curChar = '';
-        $resChar = '';
-        if($this->currentAction == ENCRYPT)
+        $resNumChar = 0;
+        $this->clearResult();
+
+        if($this->checkSimpleDigits($a, $m))
         {
             for($i = 0; $i <= mb_strlen($this->initialText); $i++)
             {
                 $curChar = $this->initialText[$i];
-                if(($numChar = $this->getNumCharFromAlphabet($curChar)) == -1)
-                {
+                if(($numChar = $this->getNumCharFromAlphabet($curChar)) == -1) {
                     continue; // skip this char
                 }
-                $resNumChar = ($a * $numChar + $b) % $m;
-                $resChar = array_values(key($this->alphabet[$resNumChar]));
+                switch($this->currentAction) {
+                    case ENCRYPT:
+                        $resNumChar = ($a * $numChar + $b) % $m;
+                        break;
+                    case DECRYPT:
+                        $resNumChar = ((intval(1 / $a)) * ($numChar - $b)) % $m;
+                        break;
+                }
+
+                $resChar = array_keys($this->alphabet)[$resNumChar];
                 $this->resultText .= $resChar;
             }
         }
     }
 
-    public function getCharAlphabet($num)
+    public function clearResult()
     {
-        for($i = 0; $i <= count($this->alphabet); $i++)
-        {
+        $this->resultText = "";
+    }
 
+    public function checkSimpleDigits($a, $m)
+    {
+        while ($a != 0 && $m != 0)
+        {
+            if($a > $m) {
+                $a = $a % $m;
+            } else {
+                $m = $m % $a;
+            }
         }
+        return $a + $m == 1 ? true : false;
     }
 
     public function getNumCharFromAlphabet($curChar)
@@ -78,7 +96,6 @@ class CryptoMethods extends Model
         }
         return $numChar;
     }
-
 
     public function rules()
     {
