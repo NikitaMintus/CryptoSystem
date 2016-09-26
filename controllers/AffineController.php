@@ -20,10 +20,17 @@ class AffineController extends Controller
             $model->txtFile = UploadedFile::getInstance($model, 'txtFile');
             if ($model->upload()) {
                 // file is uploaded successfully
-                $textArr = $model->readFileToStr();
-                $model->plainText = implode("",$textArr);
+                $model->initialText = $model->readFileToStr();
+                //$model->plainText = implode("",$textArr);
                 return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);
             }
+
+
+        }
+
+        if($modelCryptoMethods->load(Yii::$app->request->post('CryptoMethods')) && $modelCryptoMethods->validate()) {
+            $modelCryptoMethods->encryptDecrypt();
+            return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);
         }
 
         return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);

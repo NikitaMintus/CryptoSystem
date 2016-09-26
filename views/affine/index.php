@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 </div>
 
     <div class="row">
-        <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
+        <?php $form = ActiveForm::begin(['id' => 'text-form', 'options' => ['enctype' => 'multipart/form-data']]) ?>
         <div class="col-md-7">
             <label for="showPlainText">Initial text</label>
             <?= $form->field($model, 'initialText',['template'=> "{input}"])->textArea(['cols' => '50', 'rows' => '13']) ?>
@@ -26,10 +26,10 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="row">
-        <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
+        <?php $form = ActiveForm::begin(['id' => 'parameters-form']) ?>
         <div class="col-md-7">
             <label for="showResultText">Result</label>
-            <?= $form->field($model, 'resultText',['template'=> "{input}"])->textArea(['cols' => '50', 'rows' => '15']) ?>
+            <?= $form->field($modelCryptoMethods, 'resultText',['template'=> "{input}"])->textArea(['cols' => '50', 'rows' => '15']) ?>
         </div>
         <div class="col-md-5">
             <div class="row">

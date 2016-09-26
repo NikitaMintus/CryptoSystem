@@ -20,8 +20,8 @@ class CryptoMethods extends Model
 
     public function CryptoMethods($uploadModel)
     {
-        $this->uploadModel = $uploadModel;
-        $this->initialText = $uploadModel->initialText;
+        //$this->uploadModel = $uploadModel;
+        //$this->initialText = $uploadModel->initialText;
     }
 
     public function createAlphabet()
@@ -100,7 +100,7 @@ class CryptoMethods extends Model
     public function rules()
     {
         return [
-            [['txtFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt'],
+//            [['currentAction'], 'numerical', 'integerOnly' => 'true'],
         ];
     }
 

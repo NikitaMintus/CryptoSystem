@@ -11,9 +11,6 @@ class UploadForm extends Model
     */
     public $txtFile;
     public $initialText;
-    public $resultText;
-
-
 
     public function rules()
     {
@@ -65,7 +62,7 @@ class UploadForm extends Model
     public function readFileToStr()
     {
         $fileName = 'uploads/' . $this->txtFile->baseName . '.' . $this->txtFile->extension;
-        $lines = explode("\n", file_get_contents($fileName));
+        $lines = file_get_contents($fileName);
         return $lines;
 
     }
