@@ -1,27 +1,75 @@
 <?php
 namespace app\models;
 
-use app\models\UploadForm;
 use yii\base\Exception;
 use yii\base\Model;
+use yii\web\UploadedFile;
 
 define("ENCRYPT", 0);
 define("DECRYPT", 1);
 
-class CryptoMethods extends Model
+class CryptoForm extends Model
 {
+    /**
+     * @var UploadedFile
+     */
     public $currentAction; // encrypt or decrypt
     public $affineParams = [];
     public $currentMethod;
     public $alphabet = [];
-    public $uploadModel;
+    public $txtFile;
     public $initialText = "";
     public $resultText = "";
 
-    public function CryptoMethods($uploadModel)
+    public function rules()
     {
-        //$this->uploadModel = $uploadModel;
-        //$this->initialText = $uploadModel->initialText;
+        return [
+            [['txtFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt'],
+            [['currentAction', 'currentMethod', 'initialText', 'resultText', 'affineParams'], 'required'],
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'txtFile' => 'Choose file',
+            'currentMethod' => 'Choose encrypt method'
+        ];
+    }
+
+    public function upload()
+    {
+        if ($this->validate()) {
+            $this->txtFile->saveAs('uploads/' . $this->txtFile->baseName . '.' . $this->txtFile->extension);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function readFile()
+    {
+        $fileName = 'uploads/' . $this->txtFile->baseName . '.' . $this->txtFile->extension;
+        $fp = fopen($fileName, "r");
+
+        $arr = [];
+
+        while ( $line = fgets($fp, 1000) )
+        {
+            $nl = mb_strtoupper($line,'UTF-8');
+            $arr[] = $nl;
+        }
+
+        print_r($arr);
+
+    }
+
+    public function readFileToStr()
+    {
+        $fileName = 'uploads/' . $this->txtFile->baseName . '.' . $this->txtFile->extension;
+        $lines = file_get_contents($fileName);
+        return $lines;
+
     }
 
     public function createAlphabet()
@@ -96,32 +144,5 @@ class CryptoMethods extends Model
         }
         return $numChar;
     }
-
-    public function rules()
-    {
-        return [
-//            [['currentAction'], 'numerical', 'integerOnly' => 'true'],
-        ];
-    }
-
-    public function attributeLabels()
-    {
-        return [
-            'txtFile' => 'Choose file',
-            'currentMethod' => 'Choose encrypt method'
-        ];
-    }
-
-    public function upload()
-    {
-        if ($this->validate()) {
-            $this->txtFile->saveAs('uploads/' . $this->txtFile->baseName . '.' . $this->txtFile->extension);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
 }
 

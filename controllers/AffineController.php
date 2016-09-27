@@ -3,42 +3,30 @@
 namespace app\controllers;
 
 
-use app\models\CryptoMethods;
+use app\models\CryptoForm;
 use Yii;
 use yii\web\Controller;
-use app\models\UploadForm;
 use yii\web\UploadedFile;
 
 class AffineController extends Controller
 {
     public function actionIndex()
     {
-        $model = new UploadForm();
-        $modelCryptoMethods = new CryptoMethods();
+        $model = new CryptoForm();
 
-        if (Yii::$app->request->isPost) {
+        if ($model->load(Yii::$app->request->post())) {
             $model->txtFile = UploadedFile::getInstance($model, 'txtFile');
             if ($model->upload()) {
                 // file is uploaded successfully
                 $model->initialText = $model->readFileToStr();
-                //$model->plainText = implode("",$textArr);
-                return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);
             }
-
-
+            $model->encryptDecrypt();
+            return $this->render('index', ['model' => $model]);
         }
 
-        if($modelCryptoMethods->load(Yii::$app->request->post('CryptoMethods')) && $modelCryptoMethods->validate()) {
-            $modelCryptoMethods->encryptDecrypt();
-            return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);
-        }
-
-        return $this->render('index', ['model' => $model, 'modelCryptoMethods' => $modelCryptoMethods]);
+        return $this->render('index', ['model' => $model]);
     }
 
-    public function actionUpload()
-    {
 
-    }
 
 }
