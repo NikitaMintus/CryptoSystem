@@ -87,8 +87,8 @@ class CryptoForm extends Model
 
     public function encryptDecrypt()
     {
-        $a = $this->affineParams['a'];
-        $b = $this->affineParams['b'];
+        $a = $this->affineParams["'a'"];
+        $b = $this->affineParams["'b'"];
         $m = count($this->alphabet);
         $resNumChar = 0;
         $this->clearResult();
