@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'txtFile')->widget(FileInput::classname(), [
                 'options' => ['txtFile' => '*.txt'],
             ]);?>
+
         </div>
     </div>
 
@@ -44,9 +45,9 @@ use yii\widgets\ActiveForm;
                             ]);
                 ?>
 
-                <?=$form->field($model, "affineParams['a']")->textInput()->label("Please, enter parameter A"); ?>
+                <?=$form->field($model, 'affineParams[a]')->label("Please, enter parameter A"); ?>
 
-                <?=$form->field($model, "affineParams['b']")->textInput()->label("Please, enter parameter B"); ?>
+                <?=$form->field($model, 'affineParams[b]')->label("Please, enter parameter B"); ?>
 
                 <?= Button::widget([
                     'label' => 'Encrypt',
