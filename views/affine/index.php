@@ -1,15 +1,12 @@
 <?php
 
+use dosamigos\fileupload\FileUploadUI;
 use kartik\file\FileInput;
 use yii\bootstrap\Button;
+use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
 
 ?>
-
-
-<div>
-    <h1>Афинный метод</h1>
-</div>
 
     <div class="row">
         <?php $form = ActiveForm::begin(['id' => 'crypto-form', 'method' => 'post', 'options' => ['enctype' => 'multipart/form-data']]) ?>
@@ -18,8 +15,20 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'initialText',['template'=> "{input}"])->textArea(['cols' => '50', 'rows' => '13']) ?>
         </div>
         <div class="col-md-5">
-            <?= $form->field($model, 'txtFile')->widget(FileInput::classname(), [
-                'options' => ['txtFile' => '*.txt'],
+<!--            --><?//= $form->field($model, 'txtFile')->widget(FileInput::classname(), [
+//                'options' => ['txtFile' => '*.txt'],
+//            ]);?>
+
+<!--            --><?//= $form->field($model, 'txtFile')->fileInput() ?>
+            <?= $form->field($model, 'txtFile')->widget(\dosamigos\fileinput\BootstrapFileInput::className(), [
+                'options' => ['multiple' => true],
+                'clientOptions' => [
+                    'previewFileType' => 'text',
+                    'browseClass' => 'btn btn-primary grid-button',
+                    'uploadClass' => 'hidden',
+                    'removeClass' => 'btn btn-danger',
+                    'removeIcon' => '<i class="glyphicon glyphicon-trash"></i> '
+                ]
             ]);?>
 
         </div>
@@ -39,9 +48,8 @@ use yii\widgets\ActiveForm;
                 ?>
 
                 <?=$form->field($model, 'currentMethod')->dropDownList([
-                                '0' => 'Афиный метод',
-                                '1' => 'Перестановки',
-                                '2'=>'Гаусса'
+                                '0' => 'Affine method',
+                                '1' => 'Shifts method',
                             ]);
                 ?>
 
@@ -55,11 +63,31 @@ use yii\widgets\ActiveForm;
                 ]);
                 ?>
 
+
+                <?= Html::a('Download', ['/affine/download'], ['class'=>'btn btn-primary grid-button']) ?>
+
+                <?= Button::widget([
+                    'label' => 'Clear',
+                    'options' => ['class' => 'btn btn-danger', 'type' => 'button'],
+                    'id' => 'clear-button',
+                ]);
+                ?>
+
             </div>
         </div>
         <?php ActiveForm::end() ?>
     </div>
 
+<?php
+$script = <<< JS
+    $('#clear-button').click(function(){
+                $('#cryptoform-initialtext').val('');
+                $('#cryptoform-resulttext').val('');
+            });
+JS;
+//маркер конца строки, обязательно сразу, без пробелов и табуляции
+$this->registerJs($script, yii\web\View::POS_READY);
+?>
 
 
 

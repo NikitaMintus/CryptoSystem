@@ -27,8 +27,8 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
-        'brandUrl' => Yii::$app->homeUrl,
+        'brandLabel' => 'Crypto system',
+        'brandUrl' => '/web/index.php?r=affine%2Findex',
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
@@ -36,21 +36,21 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
+            ['label' => 'Home', 'url' => ['/affine/index']],
+            ['label' => 'About', 'url' => ['/affine/about']],
+            ['label' => 'Contact', 'url' => ['/affine/contact']],
+//            Yii::$app->user->isGuest ? (
+//                ['label' => 'Login', 'url' => ['/site/login']]
+//            ) : (
+//                '<li>'
+//                . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
+//                . Html::submitButton(
+//                    'Logout (' . Yii::$app->user->identity->username . ')',
+//                    ['class' => 'btn btn-link']
+//                )
+//                . Html::endForm()
+//                . '</li>'
+//            )
         ],
     ]);
     NavBar::end();

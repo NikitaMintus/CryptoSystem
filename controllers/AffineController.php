@@ -21,12 +21,33 @@ class AffineController extends Controller
                 $model->initialText = $model->readFileToStr();
             }
             $model->encryptDecrypt();
+
             return $this->render('index', ['model' => $model]);
         }
 
 
 
         return $this->render('index', ['model' => $model]);
+    }
+
+    public function actionAbout()
+    {
+        return $this->render('about');
+    }
+
+    public function actionContact()
+    {
+        return $this->render('contact');
+    }
+
+    public function actionDownload()
+    {
+        CryptoForm::download('resText.txt');
+    }
+
+    public function actionClear()
+    {
+
     }
 
 
