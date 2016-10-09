@@ -39,9 +39,12 @@ class CryptoForm extends Model
         return [
             [['txtFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt'],
             [['currentAction', 'currentMethod', 'affineParams'], 'required'],
-            [['currentMethod'], 'checkSimpleDigit'],
         ];
     }
+
+
+
+
 
     public function attributeLabels()
     {
@@ -135,7 +138,6 @@ class CryptoForm extends Model
                 $resChar = array_keys($this->alphabet)[$resNumChar - 1];
                 $this->resultText .= $resChar;
             }
-            $bnbn = 0;
             $this->writeInFile($this->resultText);
         }
     }

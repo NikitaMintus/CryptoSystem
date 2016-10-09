@@ -49,17 +49,17 @@ use yii\widgets\ActiveForm;
 
                 <?=$form->field($model, 'currentMethod')->dropDownList([
                                 '0' => 'Affine method',
-                                '1' => 'Shifts method',
-                            ]);
+                                '1' => 'Swap method',
+                            ], ['id' => 'currentMethod']);
                 ?>
 
-                <?=$form->field($model, 'affineParams[a]')->label("Please, enter parameter A"); ?>
+                <?=$form->field($model, 'affineParams[a]', ['options' => ['id' => 'affine-param-group-a']])->label("Please, enter parameter A"); ?>
 
-                <?=$form->field($model, 'affineParams[b]')->label("Please, enter parameter B"); ?>
+                <?=$form->field($model, 'affineParams[b]', ['options' => ['id' => 'affine-param-group-b']])->label("Please, enter parameter B"); ?>
 
                 <?= Button::widget([
-                    'label' => 'Encrypt',
-                    'options' => ['class' => 'btn btn-primary grid-button', 'type' => 'submit', 'method' => 'post'],
+                    'label' => 'Perform',
+                    'options' => ['class' => 'btn btn-success grid-button ', 'type' => 'submit', 'method' => 'post'],
                 ]);
                 ?>
 
@@ -84,6 +84,15 @@ $script = <<< JS
                 $('#cryptoform-initialtext').val('');
                 $('#cryptoform-resulttext').val('');
             });
+    $('#currentMethod').change(function(){
+        if($('#currentMethod').val() == '1') {
+            $('#affine-param-group-a').hide("slow");
+            $('#affine-param-group-b').hide("slow");
+        } else {
+            $('#affine-param-group-a').show("slow");
+            $('#affine-param-group-b').show("slow");
+        }
+    });
 JS;
 //маркер конца строки, обязательно сразу, без пробелов и табуляции
 $this->registerJs($script, yii\web\View::POS_READY);
