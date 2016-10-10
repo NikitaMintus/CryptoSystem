@@ -7,6 +7,9 @@ use yii\web\UploadedFile;
 
 define("ENCRYPT", 0);
 define("DECRYPT", 1);
+define("AFFINE", 0);
+define("SWAP", 1);
+define("VIGENERE", 2);
 
 class CryptoForm extends Model
 {
@@ -17,6 +20,7 @@ class CryptoForm extends Model
     public $alphabet = [];
     public $initialText = "";
     public $resultText = "";
+    public $wordKey;
 
     /**
      * @var UploadedFile
@@ -37,8 +41,8 @@ class CryptoForm extends Model
     public function rules()
     {
         return [
-            [['txtFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt'],
-            [['currentAction', 'currentMethod', 'affineParams'], 'required'],
+            [['txtFile'], 'file', 'skipOnEmpty' => false],
+            [['currentAction', 'currentMethod', 'affineParams', 'wordKey'], 'required'],
         ];
     }
 
@@ -102,43 +106,121 @@ class CryptoForm extends Model
         {
             $this->alphabet[chr($i)] = $curNum++;
         }
-        for($i = 48; $i <= 57; $i++) // digits
-        {
-            $this->alphabet[chr($i)] = $curNum++;
+        if($this->currentMethod != VIGENERE) {
+            for($i = 48; $i <= 57; $i++) // digits
+            {
+                $this->alphabet[chr($i)] = $curNum++;
+            }
         }
+    }
+
+    // swap method
+    public function BinString2BitSequence($mystring) {
+        $mybitseq = "";
+        $end = strlen($mystring);
+        for($i = 0 ; $i < $end; $i++){
+            $mybyte = decbin(ord($mystring[$i])); // convert char to bit string
+            $mybitseq .= substr("00000000",0,8 - strlen($mybyte)) . $mybyte . " "; // 8 bit packed
+        }
+        $arrBitSeq = explode(" ", $mybitseq);
+        return $arrBitSeq;
+    }
+
+    public function changeBits($curChar) {
+        $fourth = $curChar[4];
+        $curChar[4] = $curChar[5];
+        $curChar[5] = $fourth;
+        return $curChar;
+    }
+
+    public function encryptBits($initialText) {
+        $arrBitSeq = $this->BinString2BitSequence($initialText);
+        $encArrBitSeq = [];
+        for ($i = 0; $i < count($arrBitSeq); $i++) {
+            $encArrBitSeq[$i] = $this->changeBits($arrBitSeq[$i]);
+        }
+        return $encArrBitSeq;
+    }
+
+    public function convertBitsToDec($encArrBitSeq) {
+        $encryptText = '';
+        foreach($encArrBitSeq as $curValue) {
+            $encryptText .= chr(bindec($curValue));
+        }
+        return $encryptText;
     }
 
     public function encryptDecrypt()
     {
-        $this->createAlphabet();
-        $a = $this->affineParams['a'];
-        $b = $this->affineParams['b'];
-        $m = count($this->alphabet);
-        $resNumChar = 0;
-        $this->clearResult();
+        switch($this->currentMethod) {
+            case AFFINE:
+                $this->createAlphabet();
+                $a = $this->affineParams['a'];
+                $b = $this->affineParams['b'];
+                $m = count($this->alphabet);
+                $resNumChar = 0;
+                $this->clearResult();
 
-        if($this->checkSimpleDigits($a, $m))
-        {
-            for($i = 0; $i <= mb_strlen($this->initialText); $i++)
-            {
-                $curChar = mb_strtoupper($this->initialText[$i]);
-                if(($numChar = $this->getNumCharFromAlphabet($curChar)) == -1) {
-                    continue; // skip this char
-                }
-                switch($this->currentAction) {
-                    case ENCRYPT:
-                        $resNumChar = ($a * $numChar + $b) % $m;
-                        break;
-                    case DECRYPT:
-                        $inverseA = $this->inverse($a, $m);
-                        $resNumChar = $this->leadToValuesOfAlphabet(($inverseA * ($numChar - $b)) % $m, $m);
-                        break;
-                }
+                if($this->checkSimpleDigits($a, $m))
+                {
+                    for($i = 0; $i <= mb_strlen($this->initialText); $i++)
+                    {
+                        $curChar = mb_strtoupper($this->initialText[$i]);
+                        if(($numChar = $this->getNumCharFromAlphabet($curChar)) == -1) {
+                            continue; // skip this char
+                        }
+                        switch($this->currentAction) {
+                            case ENCRYPT:
+                                $resNumChar = ($a * $numChar + $b) % $m;
+                                break;
+                            case DECRYPT:
+                                $inverseA = $this->inverse($a, $m);
+                                $resNumChar = $this->leadToValuesOfAlphabet(($inverseA * ($numChar - $b)) % $m, $m);
+                                break;
+                        }
 
-                $resChar = array_keys($this->alphabet)[$resNumChar - 1];
-                $this->resultText .= $resChar;
-            }
-            $this->writeInFile($this->resultText);
+                        $resChar = array_keys($this->alphabet)[$resNumChar - 1];
+                        $this->resultText .= $resChar;
+                    }
+                    $this->writeInFile($this->resultText);
+                }
+                break;
+
+            case SWAP:
+                $encArrBitSeq = $this->encryptBits($this->initialText);
+                $this->resultText = $this->convertBitsToDec($encArrBitSeq);
+                $this->writeInFile($this->resultText);
+                break;
+            case VIGENERE:
+                $this->createAlphabet();
+                $key = $this->wordKey;
+                $m = count($this->alphabet);
+                $keyLen = strlen($key);
+                $resNumChar = 0;
+                $this->clearResult();
+
+                for($i = 0; $i <= mb_strlen($this->initialText); $i++)
+                {
+                    $curChar = mb_strtoupper($this->initialText[$i]);
+                    if(($numChar = $this->getNumCharFromAlphabet($curChar)) == -1) {
+                        continue; // skip this char
+                    }
+                    $numInKey = $i % $keyLen;
+                    $charInKey = $key[$numInKey];
+                    $numCharKey = $this->getNumCharFromAlphabet($charInKey);
+                    switch($this->currentAction) {
+                        case ENCRYPT:
+                            $resNumChar = ($numChar + $numCharKey) % $m;
+                            break;
+                        case DECRYPT:
+                            $resNumChar = ($numChar - $numCharKey + $m) % $m;
+                            break;
+                    }
+
+                    $resChar = array_keys($this->alphabet)[$resNumChar - 1];
+                    $this->resultText .= $resChar;
+                }
+                break;
         }
     }
 

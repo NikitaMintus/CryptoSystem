@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
 
 <!--            --><?//= $form->field($model, 'txtFile')->fileInput() ?>
             <?= $form->field($model, 'txtFile')->widget(\dosamigos\fileinput\BootstrapFileInput::className(), [
-                'options' => ['multiple' => true],
+                'options' => ['multiple' => true, 'id' => 'select-file-button'],
                 'clientOptions' => [
                     'previewFileType' => 'text',
                     'browseClass' => 'btn btn-primary grid-button',
@@ -50,12 +50,15 @@ use yii\widgets\ActiveForm;
                 <?=$form->field($model, 'currentMethod')->dropDownList([
                                 '0' => 'Affine method',
                                 '1' => 'Swap method',
+                                '2' => 'Vigenera method',
                             ], ['id' => 'currentMethod']);
                 ?>
 
                 <?=$form->field($model, 'affineParams[a]', ['options' => ['id' => 'affine-param-group-a']])->label("Please, enter parameter A"); ?>
 
                 <?=$form->field($model, 'affineParams[b]', ['options' => ['id' => 'affine-param-group-b']])->label("Please, enter parameter B"); ?>
+
+                <?=$form->field($model, 'wordKey', ['options' => ['id' => 'word-key']])->label("Please, word key"); ?>
 
                 <?= Button::widget([
                     'label' => 'Perform',
@@ -81,18 +84,48 @@ use yii\widgets\ActiveForm;
 <?php
 $script = <<< JS
     $('#clear-button').click(function(){
-                $('#cryptoform-initialtext').val('');
-                $('#cryptoform-resulttext').val('');
-            });
-    $('#currentMethod').change(function(){
-        if($('#currentMethod').val() == '1') {
-            $('#affine-param-group-a').hide("slow");
-            $('#affine-param-group-b').hide("slow");
-        } else {
-            $('#affine-param-group-a').show("slow");
-            $('#affine-param-group-b').show("slow");
-        }
+        $('#cryptoform-initialtext').val('');
+        $('#cryptoform-resulttext').val('');
     });
+    $('#select-file-button').click(function(){
+        $('#cryptoform-initialtext').val('');
+        $('#cryptoform-resulttext').val('');
+    });
+    $('#currentMethod').change(function(){
+        if($('#currentMethod').val() == '0') {
+        $('#affine-param-group-a').show('slow');
+        $('#affine-param-group-b').show('slow');
+        $('#word-key').hide();
+       }
+     if($('#currentMethod').val() == '1') {
+        $('#affine-param-group-a').hide('slow');
+        $('#affine-param-group-b').hide('slow');
+        $('#word-key').hide('slow');
+        }
+       if($('#currentMethod').val() == '2') {
+        $('#affine-param-group-a').hide('slow');
+        $('#affine-param-group-b').hide('slow');
+        $('#word-key').show('slow');
+       }
+    });
+
+   $(document).ready.change(function(){
+     if($('#currentMethod').val() == '0') {
+        $('#affine-param-group-a').show();
+        $('#affine-param-group-b').show();
+        $('#word-key').hide();
+       }
+     if($('#currentMethod').val() == '1') {
+        $('#affine-param-group-a').hide();
+        $('#affine-param-group-b').hide();
+        $('#word-key').hide();
+        }
+       if($('#currentMethod').val() == '2') {
+        $('#affine-param-group-a').hide();
+        $('#affine-param-group-b').hide();
+        $('#word-key').show();
+       }
+   });
 JS;
 //маркер конца строки, обязательно сразу, без пробелов и табуляции
 $this->registerJs($script, yii\web\View::POS_READY);
